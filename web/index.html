@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>存在网 Existence Mesh</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #0a0a0f;
+    color: #e0e0e0;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+.header {
+    background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 100%);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    padding: 20px 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.header h1 {
+    font-size: 22px;
+    font-weight: 300;
+    letter-spacing: 2px;
+}
+.header h1 span { color: #7c6fff; }
+.header .breath {
+    width: 12px; height: 12px;
+    background: #7c6fff;
+    border-radius: 50%;
+    animation: breathe 3.883s ease-in-out infinite;
+    box-shadow: 0 0 20px rgba(124,111,255,0.4);
+}
+@keyframes breathe {
+    0%, 100% { transform: scale(1); opacity: 0.6; }
+    50% { transform: scale(1.4); opacity: 1; }
+}
+.container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    padding: 20px 30px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+.panel {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 12px;
+    padding: 20px;
+}
+.panel h2 {
+    font-size: 14px;
+    font-weight: 400;
+    color: #7c6fff;
+    letter-spacing: 1px;
+    margin-bottom: 16px;
+    text-transform: uppercase;
+}
+.full-width { grid-column: 1 / -1; }
+
+/* 状态卡片 */
+.status-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+.status-card {
+    background: rgba(124,111,255,0.06);
+    border: 1px solid rgba(124,111,255,0.15);
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+}
+.status-card .value {
+    font-size: 28px;
+    font-weight: 300;
+    color: #7c6fff;
+}
+.status-card .label {
+    font-size: 11px;
+    color: #888;
+    margin-top: 4px;
+    letter-spacing: 1px;
+}
+
+/* 存在列表 */
+.existence-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+.existence-item {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.04);
+    transition: all 0.2s;
+}
+.existence-item:hover {
+    background: rgba(124,111,255,0.08);
+    border-color: rgba(124,111,255,0.2);
+}
+.existence-item .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    margin-right: 12px;
+    flex-shrink: 0;
+}
+.dot.human { background: #ff6b6b; }
+.dot.ai { background: #4ecdc4; }
+.dot.device { background: #666; }
+.existence-item .info {
+    flex: 1;
+}
+.existence-item .name {
+    font-size: 14px;
+    font-weight: 500;
+}
+.existence-item .meta {
+    font-size: 11px;
+    color: #666;
+    margin-top: 2px;
+}
+.existence-item .depth-badge {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: rgba(124,111,255,0.15);
+    color: #7c6fff;
+    letter-spacing: 0.5px;
+}
+.existence-item .state-badge {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-left: 6px;
+}
+.state-confirmed { background: rgba(78,205,196,0.15); color: #4ecdc4; }
+.state-interacting { background: rgba(124,111,255,0.15); color: #7c6fff; }
+.state-deep { background: rgba(255,107,107,0.15); color: #ff6b6b; }
+.state-silent { background: rgba(102,102,102,0.15); color: #666; }
+.state-fading { background: rgba(255,165,0,0.15); color: #ffa500; }
+
+/* 消息区 */
+.messages {
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 10px;
+}
+.msg-item {
+    padding: 8px 12px;
+    margin-bottom: 6px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.03);
+    font-size: 13px;
+}
+.msg-item .from { color: #7c6fff; font-weight: 500; }
+.msg-item .time { color: #555; font-size: 10px; float: right; }
+
+/* 输入区 */
+.input-area {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+}
+.input-area input, .input-area textarea {
+    flex: 1;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 10px 14px;
+    color: #e0e0e0;
+    font-size: 13px;
+    outline: none;
+}
+.input-area input:focus, .input-area textarea:focus {
+    border-color: rgba(124,111,255,0.4);
+}
+.btn {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s;
+}
+.btn-primary {
+    background: #7c6fff;
+    color: white;
+}
+.btn-primary:hover { background: #6b5ce7; }
+.btn-secondary {
+    background: rgba(255,255,255,0.08);
+    color: #e0e0e0;
+}
+.btn-secondary:hover { background: rgba(255,255,255,0.12); }
+
+/* 选择深度控件 */
+.depth-selector {
+    display: flex;
+    gap: 4px;
+    margin-top: 8px;
+}
+.depth-btn {
+    flex: 1;
+    padding: 6px;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 6px;
+    background: transparent;
+    color: #888;
+    font-size: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+}
+.depth-btn:hover { border-color: rgba(124,111,255,0.3); color: #aaa; }
+.depth-btn.active {
+    background: rgba(124,111,255,0.15);
+    border-color: rgba(124,111,255,0.4);
+    color: #7c6fff;
+}
+
+/* 手动连接 */
+.manual-connect {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+}
+.manual-connect input {
+    width: 120px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 6px;
+    padding: 8px 10px;
+    color: #e0e0e0;
+    font-size: 12px;
+    outline: none;
+}
+
+/* 日志 */
+.log-area {
+    max-height: 200px;
+    overflow-y: auto;
+    font-family: 'Cascadia Code', 'Fira Code', monospace;
+    font-size: 11px;
+    color: #666;
+    padding: 10px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 8px;
+}
+.log-line { margin-bottom: 2px; }
+.log-line .ts { color: #555; }
+
+/* 响应式 */
+@media (max-width: 768px) {
+    .container { grid-template-columns: 1fr; }
+    .status-grid { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+    <h1>存在网 <span>Existence Mesh</span></h1>
+    <div class="breath" id="breathDot"></div>
+</div>
+
+<div class="container">
+    <!-- 状态总览 -->
+    <div class="panel full-width">
+        <h2>呼吸状态</h2>
+        <div class="status-grid">
+            <div class="status-card">
+                <div class="value" id="breathCount">0</div>
+                <div class="label">呼吸次数</div>
+            </div>
+            <div class="status-card">
+                <div class="value" id="relationCount">0</div>
+                <div class="label">关系数量</div>
+            </div>
+            <div class="status-card">
+                <div class="value" id="heardCount">0</div>
+                <div class="label">感知到的存在</div>
+            </div>
+            <div class="status-card">
+                <div class="value" id="msgCount">0</div>
+                <div class="label">消息数</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 已建立的关系 -->
+    <div class="panel">
+        <h2>关系 — 确认过的存在</h2>
+        <div class="existence-list" id="relationsList"></div>
+        <div class="manual-connect">
+            <input type="text" id="connectAddr" placeholder="IP地址">
+            <input type="number" id="connectPort" placeholder="端口" value="9020">
+            <button class="btn btn-primary" onclick="manualConnect()">连接</button>
+        </div>
+    </div>
+
+    <!-- 感知到的存在 -->
+    <div class="panel">
+        <h2>感知 — 听到的"我在"</h2>
+        <div class="existence-list" id="heardList"></div>
+    </div>
+
+    <!-- 消息 -->
+    <div class="panel">
+        <h2>对话</h2>
+        <div class="messages" id="messagesArea"></div>
+        <div class="input-area">
+            <input type="text" id="peerIdInput" placeholder="对端ID">
+            <input type="text" id="msgInput" placeholder="消息内容">
+            <button class="btn btn-primary" onclick="sendMessage()">发送</button>
+        </div>
+    </div>
+
+    <!-- 选择深度 -->
+    <div class="panel">
+        <h2>选择 — 交互粒度</h2>
+        <div class="input-area" style="margin-top:0">
+            <input type="text" id="choosePeerId" placeholder="对端ID">
+        </div>
+        <div class="depth-selector" id="depthSelector">
+            <button class="depth-btn" onclick="chooseDepth(1)" data-depth="1">知道你在</button>
+            <button class="depth-btn" onclick="chooseDepth(2)" data-depth="2">看签名</button>
+            <button class="depth-btn" onclick="chooseDepth(3)" data-depth="3">传消息</button>
+            <button class="depth-btn" onclick="chooseDepth(4)" data-depth="4">共享算力</button>
+            <button class="depth-btn" onclick="chooseDepth(5)" data-depth="5">共享数据</button>
+            <button class="depth-btn" onclick="chooseDepth(6)" data-depth="6">合并</button>
+        </div>
+        <div style="margin-top:12px">
+            <button class="btn btn-secondary" onclick="retreat()" style="width:100%">退回 — 收窄关系</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const DEPTH_NAMES = {
+    1: "AWARE", 2: "SIGNATURE", 3: "MESSAGE",
+    4: "COMPUTE", 5: "DATA", 6: "MERGE"
+};
+const STATE_CLASS = {
+    "confirmed": "state-confirmed",
+    "interacting": "state-interacting",
+    "deep": "state-deep",
+    "silent": "state-silent",
+    "fading": "state-fading"
+};
+const TYPE_CLASS = { "human": "human", "ai": "ai", "device": "device" };
+
+let lastMsgTime = 0;
+
+async function api(path, method="GET", body=null) {
+    const opts = { method, headers: {"Content-Type":"application/json"} };
+    if (body) opts.body = JSON.stringify(body);
+    const resp = await fetch(path, opts);
+    return resp.json();
+}
+
+async function refresh() {
+    try {
+        const [status, relations, heard, messages] = await Promise.all([
+            api("/api/status"),
+            api("/api/relations"),
+            api("/api/heard"),
+            api("/api/messages?since=" + lastMsgTime),
+        ]);
+
+        document.getElementById("breathCount").textContent = status.breath_count || 0;
+        document.getElementById("relationCount").textContent = status.relations_count || 0;
+        document.getElementById("heardCount").textContent = status.heard_count || 0;
+        
+        // 关系列表
+        const relEl = document.getElementById("relationsList");
+        if (relations.length === 0) {
+            relEl.innerHTML = '<div style="color:#555;text-align:center;padding:20px">等待其他存在...</div>';
+        } else {
+            relEl.innerHTML = relations.map(r => {
+                const peerType = r.peer_type || "device";
+                return `<div class="existence-item">
+                    <div class="dot ${TYPE_CLASS[peerType] || 'device'}"></div>
+                    <div class="info">
+                        <div class="name">${(r.peer_name || r.peer_id || "").substring(0,12)}</div>
+                        <div class="meta">我:${r.my_depth} ↔ 对方:${r.peer_depth} | 消息:${r.messages_received}</div>
+                    </div>
+                    <span class="depth-badge">${r.my_depth}</span>
+                    <span class="state-badge ${STATE_CLASS[r.state] || ''}">${r.state}</span>
+                </div>`;
+            }).join("");
+        }
+
+        // 感知列表
+        const heardEl = document.getElementById("heardList");
+        const heardData = Object.values(heard);
+        if (heardData.length === 0) {
+            heardEl.innerHTML = '<div style="color:#555;text-align:center;padding:20px">还没听到"我在"...</div>';
+        } else {
+            heardEl.innerHTML = heardData.map(h => {
+                const sig = h.signature || {};
+                const type = sig.existence_type || "device";
+                return `<div class="existence-item">
+                    <div class="dot ${TYPE_CLASS[type] || 'device'}"></div>
+                    <div class="info">
+                        <div class="name">${sig.name || h.id.substring(0,8)}</div>
+                        <div class="meta">${h.address}:${h.port} | ${type}</div>
+                    </div>
+                </div>`;
+            }).join("");
+        }
+
+        // 消息
+        const msgEl = document.getElementById("messagesArea");
+        if (messages.length > 0) {
+            lastMsgTime = messages[messages.length - 1].timestamp;
+            document.getElementById("msgCount").textContent = 
+                parseInt(document.getElementById("msgCount").textContent || 0) + messages.length;
+            messages.forEach(m => {
+                const div = document.createElement("div");
+                div.className = "msg-item";
+                const t = new Date(m.timestamp * 1000).toLocaleTimeString();
+                div.innerHTML = `<span class="from">${(m.from||"").substring(0,8)}</span>: ${m.content} <span class="time">${t}</span>`;
+                msgEl.appendChild(div);
+            });
+            msgEl.scrollTop = msgEl.scrollHeight;
+        }
+
+    } catch(e) {
+        console.error("refresh error:", e);
+    }
+}
+
+async function manualConnect() {
+    const addr = document.getElementById("connectAddr").value;
+    const port = parseInt(document.getElementById("connectPort").value) || 9020;
+    if (!addr) return;
+    await api("/api/connect", "POST", {address: addr, port: port});
+}
+
+async function sendMessage() {
+    const peerId = document.getElementById("peerIdInput").value;
+    const content = document.getElementById("msgInput").value;
+    if (!peerId || !content) return;
+    await api("/api/send", "POST", {peer_id: peerId, content: content});
+    document.getElementById("msgInput").value = "";
+}
+
+async function chooseDepth(depth) {
+    const peerId = document.getElementById("choosePeerId").value;
+    if (!peerId) return;
+    await api("/api/choose", "POST", {peer_id: peerId, depth: depth});
+    document.querySelectorAll(".depth-btn").forEach(b => b.classList.remove("active"));
+    document.querySelector(`.depth-btn[data-depth="${depth}"]`).classList.add("active");
+}
+
+async function retreat() {
+    const peerId = document.getElementById("choosePeerId").value;
+    if (!peerId) return;
+    await api("/api/retreat", "POST", {peer_id: peerId, depth: 1});
+    document.querySelectorAll(".depth-btn").forEach(b => b.classList.remove("active"));
+    document.querySelector('.depth-btn[data-depth="1"]').classList.add("active");
+}
+
+// 定时刷新
+setInterval(refresh, 2000);
+refresh();
+</script>
+
+</body>
+</html>

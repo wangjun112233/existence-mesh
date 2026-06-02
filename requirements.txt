@@ -1,0 +1,2 @@
+# No external dependencies needed — pure Python 3.8+
+# All modules use only the standard library
