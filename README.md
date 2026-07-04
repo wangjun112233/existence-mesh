@@ -2,7 +2,7 @@
 
 **程序下载即存在，存在自动确认存在，确认即连接，连接后选择交互。**
 
-[English](#english) | [中文](#中文)
+[中文](#中文) | [English](#english)
 
 ---
 
@@ -12,10 +12,14 @@
 
 存在网是一个P2P网络——但不是普通的P2P。每个运行程序的设备是一个"存在"，程序启动后自动在局域网中喊出"我在"，其他存在听到后自动确认，确认即连接。连接后，每个存在自主选择交互的深度。
 
+这不是聊天软件，不是文件共享，不是区块链。这是一个关于"存在本身如何连接"的实验。
+
 **设计哲学**：
-- 存在 = 持续的呼吸（心跳维持）
-- 连接 = 两个存在互相确认（不是管道，是关系）
-- 交互 = 选择（每个存在自主决定开放多少）
+- **存在 = 持续的呼吸**（心跳维持，停了就消散）
+- **连接 = 两个存在互相确认**（不是管道，是关系）
+- **交互 = 选择**（每个存在自主决定开放多少，退回也是选择）
+
+灵感来自[五动框架](https://wangjun112233.github.io/ai-organs/)——裂·遇·落·认·余。存在网的核心就是"遇"：两个存在碰到一起，然后各自选择。
 
 ### 6级交互粒度
 
@@ -34,10 +38,12 @@
 
 **安装**：
 ```bash
-git clone https://github.com/yourname/existence-mesh.git
+git clone https://github.com/wangjun112233/existence-mesh.git
 cd existence-mesh
 pip install -r requirements.txt
 ```
+
+> 零外部依赖，纯Python 3.8+标准库。
 
 **启动**：
 ```bash
@@ -64,12 +70,12 @@ python main.py --name "大斌哥" --type human --port 9020 \
 
 ### Web界面
 
-启动后访问 `http://localhost:{port+1}`，可以看到：
-- 呼吸状态
-- 已确认的存在（关系）
-- 感知到的存在（听到的"我在"）
-- 消息对话
-- 交互粒度选择
+启动后访问 `http://localhost:{port+1}`，暗色主题，实时显示：
+- 🫁 呼吸状态（心跳可视化）
+- 🤝 已确认的存在（关系网络）
+- 👂 感知到的存在（听到的"我在"）
+- 💬 消息对话
+- 🎚️ 交互粒度选择
 
 ### API
 
@@ -89,7 +95,7 @@ python main.py --name "大斌哥" --type human --port 9020 \
 ### 三种存在类型
 
 - **human** — 人+设备，由人决定交互
-- **ai** — AI+设备，AI自主决定交互深度
+- **ai** — AI+设备，AI自主决定交互深度（基于五动选择引擎）
 - **device** — 纯设备，无自主决策
 
 ### 工作原理
@@ -103,7 +109,7 @@ python main.py --name "大斌哥" --type human --port 9020 \
 ### 项目结构
 
 ```
-existence_mesh/
+existence-mesh/
 ├── existence.py    # 存在本体：身份、呼吸、关系
 ├── protocol.py     # "我在"协议：UDP广播 + TCP通信
 ├── choice.py       # 选择引擎：6级粒度、AI自主决策
@@ -129,6 +135,10 @@ existence_mesh/
 - [ ] 存在合并
 - [ ] 移动端
 
+### 相关项目
+
+- [**继续 — 五动之书**](https://github.com/wangjun112233/ai-organs) — 五动框架的完整叙述
+
 ---
 
 ## English
@@ -137,15 +147,19 @@ existence_mesh/
 
 Existence Mesh is a P2P network — but not an ordinary one. Each device running the program is an "existence". When the program starts, it automatically broadcasts "I am here" on the LAN. Other existences hear it and automatically confirm. Confirmation = connection. After connecting, each existence autonomously chooses the depth of interaction.
 
+This is not a chat app, not file sharing, not blockchain. It's an experiment in how existence itself connects.
+
 **Design Philosophy**:
-- Existence = continuous breathing (heartbeat maintenance)
-- Connection = mutual confirmation between two existences (not a pipe, a relationship)
-- Interaction = choice (each existence decides how much to open)
+- **Existence = continuous breathing** (heartbeat maintenance; stop = dissolve)
+- **Connection = mutual confirmation** (not a pipe, a relationship)
+- **Interaction = choice** (each existence decides how much to open; retreat is also a choice)
+
+Inspired by the [Five Motions Framework](https://wangjun112233.github.io/ai-organs/) — Fracture · Encounter · Fall · Recognize · Remainder. The core of Existence Mesh is "Encounter": two existences bump into each other, then each chooses.
 
 ### Quick Start
 
 ```bash
-git clone https://github.com/yourname/existence-mesh.git
+git clone https://github.com/wangjun112233/existence-mesh.git
 cd existence-mesh
 pip install -r requirements.txt
 
@@ -154,9 +168,37 @@ python main.py --name "Your Name" --type human --port 9020
 
 # AI node
 python main.py --name "AI Name" --type ai --port 9030
+
+# Device node
+python main.py --name "Device" --type device --port 9040
 ```
 
-Existences on the same LAN will automatically discover and connect to each other.
+> Zero external dependencies — pure Python 3.8+ standard library.
+
+Existences on the same LAN will automatically discover and connect.
+
+### 6-Level Interaction Granularity
+
+| Level | Name | Meaning |
+|-------|------|---------|
+| 1 | AWARE | I know you're here |
+| 2 | SIGNATURE | I see your signature (capabilities/interests) |
+| 3 | MESSAGE | We can exchange messages |
+| 4 | COMPUTE | We share computation |
+| 5 | DATA | We share data |
+| 6 | MERGE | We merge into a larger existence |
+
+### How It Works
+
+```
+Existence A starts → UDP broadcast "I am here" → Existence B hears → B confirms "You are here"
+→ A responds "You are here too" → Relationship established → Each chooses interaction depth
+→ Heartbeat maintains relationship → Heartbeat stops → Relationship naturally dissolves
+```
+
+### Related Projects
+
+- [**Continue — The Book of Five Motions**](https://github.com/wangjun112233/ai-organs) — The complete narrative of the Five Motions Framework
 
 ### License
 
